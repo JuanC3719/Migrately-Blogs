@@ -1,0 +1,32 @@
+.ck-editor__editable_inline {
+    min-height: 175px !important;
+}
+
+.blogform-card-shadow {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.blogform-validation-error-message {
+    color: red;
+}
+
+.blogcard-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.blogcard {
+    height: 450px;
+    width: 400px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.center-searchbar {
+    margin: auto;
+    width: 100%;
+    padding: 10px;
+  }
