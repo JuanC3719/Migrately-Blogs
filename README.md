@@ -4,7 +4,7 @@
 
 #
 
-● Developed and structured the administrator dashboard functionality from front-end to back-end.
+● Developed and structured the blogs submission functionality from front-end to back-end.
 
 ● Created the necessary procedures in SQL utilizing joins, foreign keys and pagination.
 
