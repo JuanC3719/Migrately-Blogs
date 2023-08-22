@@ -3,22 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace Migrately.Models.Domain
 {
-    public class Blog 
+    public record Blog
     {
-        public int Id { get; set; }
-        public LookUp BlogType { get; set; }
-        public int AuthorId { get; set; }
-        public string Title { get; set; }
-        public string Subject { get; set; }
-        public string Content { get; set; }
-        public Uri ImageUrl { get; set; }
-        public DateTime DateCreated { get; set; }
-        public DateTime DateModified { get; set; }
-        public DateTime DatePublished { get; set; }
-        public bool IsPublished { get; set; }
-        public bool IsDeleted { get; set; }
+        public int Id { get; init; }
+
+        [Display(Name = "Blog Type")]
+        public LookUp BlogType { get; init; }
+
+        [Display(Name = "Author ID")]
+        public int AuthorId { get; init; }
+
+        [Required(ErrorMessage = "Title is required")]
+        public string Title { get; init; }
+
+        public string Subject { get; init; }
+
+        public string Content { get; init; }
+
+        [Url]
+        [Display(Name = "Image URL")]
+        public Uri ImageUrl { get; init; }
+
+        [Display(Name = "Created Date")]
+        public DateTime DateCreated { get; init; }
+
+        [Display(Name = "Modified Date")]
+        public DateTime DateModified { get; init; }
+
+        [Display(Name = "Published Date")]
+        public DateTime DatePublished { get; init; }
+
+        [Display(Name = "Is Published")]
+        public bool IsPublished { get; init; }
+
+        [Display(Name = "Is Deleted")]
+        public bool IsDeleted { get; init; }
     }
 }
