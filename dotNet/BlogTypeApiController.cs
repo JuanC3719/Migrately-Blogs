@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Migrately.Services.Interfaces;
-using Migrately.Services;
 using Migrately.Web.Controllers;
 using Migrately.Web.Models.Responses;
-using System.Collections.Generic;
-using System;
 using Migrately.Models.Domain;
+using System;
+using System.Collections.Generic;
 
 namespace Migrately.Web.Api.Controllers
 {
@@ -14,23 +13,23 @@ namespace Migrately.Web.Api.Controllers
     [ApiController]
     public class BlogTypeApiController : BaseApiController
     {
-        private IBlogTypeService _blogTypeService;
-        private IAuthenticationService<int> _authService;
+        private readonly IBlogTypeService _blogTypeService;
+        private readonly IAuthenticationService<int> _authService;
 
-        public BlogTypeApiController(IBlogTypeService blogTypeService
-            , IAuthenticationService<int> authService
-            , ILogger<ExamplesApiController> logger) : base(logger)
+        public BlogTypeApiController(
+            IBlogTypeService blogTypeService,
+            IAuthenticationService<int> authService,
+            ILogger<BlogTypeApiController> logger) : base(logger)
         {
-            _blogTypeService = blogTypeService;
-            _authService = authService;
-
+            _blogTypeService = blogTypeService ?? throw new ArgumentNullException(nameof(blogTypeService));
+            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
         }
 
         [HttpGet("all")]
         public ActionResult<ItemsResponse<BlogType>> GetAll()
         {
-            int code = 200;
-            BaseResponse response = null;//do not declare an instance.
+            int statusCode = 200;
+            BaseResponse response;
 
             try
             {
@@ -38,7 +37,7 @@ namespace Migrately.Web.Api.Controllers
 
                 if (list == null)
                 {
-                    code = 404;
+                    statusCode = 404;
                     response = new ErrorResponse("App Resource not found.");
                 }
                 else
@@ -48,14 +47,12 @@ namespace Migrately.Web.Api.Controllers
             }
             catch (Exception ex)
             {
-                code = 500;
+                statusCode = 500;
                 response = new ErrorResponse(ex.Message);
-                base.Logger.LogError(ex.ToString());
+                Logger.LogError(ex, "An error occurred while processing the request.");
             }
 
-
-            return StatusCode(code, response);
-
+            return StatusCode(statusCode, response);
         }
     }
 }
