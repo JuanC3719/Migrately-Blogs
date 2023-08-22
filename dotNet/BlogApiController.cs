@@ -17,252 +17,162 @@ using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace Migrately.Web.Api.Controllers
 {
-    
     [Route("api/blogs")]
     [ApiController]
     public class BlogApiController : BaseApiController
     {
-        private IBlogService _blogService;
-        private IAuthenticationService<int> _authService;
+        private readonly IBlogService _blogService;
+        private readonly IAuthenticationService<int> _authService;
 
-        public BlogApiController(IBlogService blogService
-            , IAuthenticationService<int> authService
-            , ILogger<ExamplesApiController> logger) : base(logger)
+        public BlogApiController(IBlogService blogService, IAuthenticationService<int> authService, ILogger<BlogApiController> logger) : base(logger)
         {
-            _blogService = blogService;
-            _authService = authService;
+            _blogService = blogService ?? throw new ArgumentNullException(nameof(blogService));
+            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
         }
+
         [HttpGet("{id:int}")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<Blog>> GetBlogById(int id)
-
+        public async Task<ActionResult<ItemResponse<Blog>>> GetBlogById(int id)
         {
-
-            int iCode = 200;
-            BaseResponse response = null;
-
             try
             {
-                Blog blog = _blogService.GetBlogById(id);
-
+                var blog = await _blogService.GetBlogByIdAsync(id);
                 if (blog == null)
                 {
-                    iCode = 404;
-                    response = new ErrorResponse("No Records Found");
+                    return NotFound(new ErrorResponse("No Records Found"));
                 }
-                else
-                {
-                    response = new ItemResponse<Blog> { Item = blog };
-                }
+                return Ok(new ItemResponse<Blog> { Item = blog });
             }
             catch (Exception ex)
             {
-                iCode = 500;
-                base.Logger.LogError(ex.ToString());
-                response = new ErrorResponse(ex.Message);
+                base.Logger.LogError(ex, "Error getting blog by ID.");
+                return StatusCode(500, new ErrorResponse(ex.Message));
             }
-
-            return StatusCode(iCode, response);
-
         }
 
         [HttpGet("paginate")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<Paged<Blog>>> GetAllBlogsByPage(int pageIndex, int pageSize)
+        public async Task<ActionResult<ItemResponse<Paged<Blog>>>> GetAllBlogsByPage(int pageIndex, int pageSize)
         {
-            int iCode = 200;
-            BaseResponse response = null;
-
             try
             {
-                Paged<Blog> blogList = _blogService.GetAllBlogsByPage(pageIndex, pageSize);
-
+                var blogList = await _blogService.GetAllBlogsByPageAsync(pageIndex, pageSize);
                 if (blogList == null)
                 {
-                    iCode = 404;
-                    response = new ErrorResponse("No Records Found");
+                    return NotFound(new ErrorResponse("No Records Found"));
                 }
-                else
-                {
-                    response = new ItemResponse<Paged<Blog>> { Item = blogList };
-                }
+                return Ok(new ItemResponse<Paged<Blog>> { Item = blogList });
             }
             catch (Exception ex)
             {
-                iCode = 500;
-                base.Logger.LogError(ex.ToString());
-                response = new ErrorResponse(ex.Message);
+                base.Logger.LogError(ex, "Error getting paginated blogs.");
+                return StatusCode(500, new ErrorResponse(ex.Message));
             }
-
-            return StatusCode(iCode, response); 
         }
 
         [HttpPost]
-        public ActionResult<ItemResponse<int>> AddBlog(BlogAddRequest model)
+        public async Task<ActionResult<ItemResponse<int>>> AddBlog(BlogAddRequest model)
         {
-            int iCode = 200;
-            BaseResponse response = null;
-
             try
             {
-
-                int id = _blogService.AddBlog(model);
-
-                response = new SuccessResponse();
-
+                int id = await _blogService.AddBlogAsync(model);
+                return Ok(new SuccessResponse());
             }
-
             catch (Exception ex)
             {
-                iCode = 500;
-                response = new ErrorResponse(ex.Message);
-
+                base.Logger.LogError(ex, "Error adding a blog.");
+                return StatusCode(500, new ErrorResponse(ex.Message));
             }
-
-            return StatusCode(iCode, response);
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<SuccessResponse> UpdateBlog(BlogUpdateRequest model)
+        public async Task<ActionResult<SuccessResponse>> UpdateBlog(BlogUpdateRequest model)
         {
-            int iCode = 200;
-            BaseResponse response = null;
-
             try
             {
-
-                _blogService.UpdateBlog(model);
-
-                response = new SuccessResponse();
+                await _blogService.UpdateBlogAsync(model);
+                return Ok(new SuccessResponse());
             }
-
             catch (Exception ex)
             {
-                iCode = 500;
-                response = new ErrorResponse(ex.Message);
+                base.Logger.LogError(ex, "Error updating a blog.");
+                return StatusCode(500, new ErrorResponse(ex.Message));
             }
-
-            return StatusCode(iCode, response);
         }
 
         [HttpPut("delete/{id:int}")]
-        public ActionResult<SuccessResponse> UpdateIsDeletedBlog(BlogIsDeletedUpdateRequest model)
+        public async Task<ActionResult<SuccessResponse>> UpdateIsDeletedBlog(BlogIsDeletedUpdateRequest model)
         {
-            int iCode = 200;
-            BaseResponse response = null;
-
             try
             {
-
-                _blogService.UpdateIsDeletedBlog(model);
-
-                response = new SuccessResponse();
+                await _blogService.UpdateIsDeletedBlogAsync(model);
+                return Ok(new SuccessResponse());
             }
-
             catch (Exception ex)
             {
-                iCode = 500;
-                response = new ErrorResponse(ex.Message);
+                base.Logger.LogError(ex, "Error updating 'IsDeleted' status for a blog.");
+                return StatusCode(500, new ErrorResponse(ex.Message));
             }
-
-            return StatusCode(iCode, response);
         }
 
-        [AllowAnonymous]
         [HttpGet("blogtypes")]
-        public ActionResult<ItemResponse<Paged<Blog>>> GetByBlogType(int pageIndex, int pageSize, int blogTypeId)
-
+        [AllowAnonymous]
+        public async Task<ActionResult<ItemResponse<Paged<Blog>>>> GetByBlogType(int pageIndex, int pageSize, int blogTypeId)
         {
-
-            int iCode = 200;
-            BaseResponse response = null;
-
             try
             {
-               Paged<Blog> page = _blogService.GetByBlogType(pageIndex, pageSize, blogTypeId);
-
+                var page = await _blogService.GetByBlogTypeAsync(pageIndex, pageSize, blogTypeId);
                 if (page == null)
                 {
-                    iCode = 404;
-                    response = new ErrorResponse("No Records Found");
+                    return NotFound(new ErrorResponse("No Records Found"));
                 }
-                else
-                {
-                    response = new ItemResponse<Paged<Blog>> { Item = page };
-                }
+                return Ok(new ItemResponse<Paged<Blog>> { Item = page });
             }
             catch (Exception ex)
             {
-                iCode = 500;
-                base.Logger.LogError(ex.ToString());
-                response = new ErrorResponse(ex.Message);
+                base.Logger.LogError(ex, "Error getting blogs by blog type.");
+                return StatusCode(500, new ErrorResponse(ex.Message));
             }
-
-            return StatusCode(iCode, response);
-
         }
 
         [HttpGet("search")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<Paged<Blog>>> SearchBlogs(int pageIndex, int pageSize, string query)
+        public async Task<ActionResult<ItemResponse<Paged<Blog>>>> SearchBlogs(int pageIndex, int pageSize, string query)
         {
-            int code = 200;
-            BaseResponse response = null;
             try
             {
-                Paged<Blog> page = _blogService.SearchBlogs(pageIndex, pageSize, query);
-
+                var page = await _blogService.SearchBlogsAsync(pageIndex, pageSize, query);
                 if (page == null)
                 {
-                    code = 404;
-                    response = new ErrorResponse("App Resource not found.");
+                    return NotFound(new ErrorResponse("App Resource not found."));
                 }
-                else
-                {
-                    response = new ItemResponse<Paged<Blog>> { Item = page };
-                }
+                return Ok(new ItemResponse<Paged<Blog>> { Item = page });
             }
             catch (Exception ex)
             {
-                code = 500;
-                response = new ErrorResponse(ex.Message);
-                base.Logger.LogError(ex.ToString());
+                base.Logger.LogError(ex, "Error searching blogs.");
+                return StatusCode(500, new ErrorResponse(ex.Message));
             }
-
-            return StatusCode(code, response);
         }
 
         [HttpGet("author/paginate")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<Paged<Blog>>> GetBlogByAuthorId(int authorId, int pageIndex, int pageSize)
+        public async Task<ActionResult<ItemResponse<Paged<Blog>>>> GetBlogByAuthorId(int authorId, int pageIndex, int pageSize)
         {
-            int iCode = 200;
-            BaseResponse response = null;
             try
             {
-                Paged<Blog> blogList = _blogService.GetBlogByAuthorId(authorId, pageIndex, pageSize);
-
+                var blogList = await _blogService.GetBlogByAuthorIdAsync(authorId, pageIndex, pageSize);
                 if (blogList == null)
                 {
-                    iCode = 404;
-                    response = new ErrorResponse("No Records Found"); 
+                    return NotFound(new ErrorResponse("No Records Found"));
                 }
-                else
-                {
-                    response = new ItemResponse<Paged<Blog>> { Item = blogList };
-                }
+                return Ok(new ItemResponse<Paged<Blog>> { Item = blogList });
             }
             catch (Exception ex)
             {
-                iCode = 500;
-                base.Logger.LogError(ex.ToString());
-                response = new ErrorResponse(ex.Message); 
+                base.Logger.LogError(ex, "Error getting blogs by author ID.");
+                return StatusCode(500, new ErrorResponse(ex.Message));
             }
-
-            return StatusCode(iCode, response);
         }
-        
-       
-
     }
 }
