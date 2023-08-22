@@ -9,23 +9,29 @@ namespace Migrately.Models.Requests
 {
     public class BlogAddRequest
     {
+        [Required(ErrorMessage = "Blog Type ID is required")]
+        public int BlogTypeId { get; init; }
 
-        public int BlogTypeId { get; set; }
-   
-        public int AuthorId { get; set; }
-    
-        public string Title { get; set; }
-       
-        public string Subject { get; set; }
-     
-        public string Content { get; set; }
+        [Required(ErrorMessage = "Author ID is required")]
+        public int AuthorId { get; init; }
 
-        public bool IsPublished { get; set; }   
-       
-        public string ImageUrl { get; set; }
+        [Required(ErrorMessage = "Title is required")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 100 characters")]
+        public string Title { get; init; }
 
-        public bool IsDeleted { get; set; }
+        public string Subject { get; init; }
 
+        [Required(ErrorMessage = "Content is required")]
+        public string Content { get; init; }
+
+        [Display(Name = "Published")]
+        public bool IsPublished { get; init; }
+
+        [Url(ErrorMessage = "Invalid URL format")]
+        [Display(Name = "Image URL")]
+        public string ImageUrl { get; init; }
+
+        [Display(Name = "Deleted")]
+        public bool IsDeleted { get; init; }
     }
-
 }
