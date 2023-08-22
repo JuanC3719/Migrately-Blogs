@@ -1,3 +1,4 @@
+/* Default styles */
 .ck-editor__editable_inline {
     min-height: 175px !important;
 }
@@ -19,14 +20,33 @@
 .blogcard {
     height: 450px;
     width: 400px;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px;
 }
 
 .center-searchbar {
     margin: auto;
     width: 100%;
     padding: 10px;
-  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .blogcard {
+        width: 100%; 
+        height: auto; 
+    }
+}
+
+@media (max-width: 600px) {
+    .blogform-card-shadow {
+        box-shadow: none;
+    }
+
+    .blogcard-img {
+        height: auto;
+    }
+
+    .center-searchbar {
+        padding: 5px; 
+    }
+}
